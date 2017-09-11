@@ -29,6 +29,40 @@ db.once("open", function() {
 });
 
 
+//Twitter Bot
+var Twitter = require("twitter");
+var config = require('./config.js');
+// console.log('config: ', config);
+var client = new Twitter(config);
+
+var params = {screen_name: 'tPhilosophia', trim_user: true, exclude_replies: true, include_rts: false, count: 200};
+
+client.get('statuses/user_timeline', params, function(error, tweets, response) {
+  if (error) {
+    console.log('error:', error);
+  } else {
+    console.log('tweets: nice!');
+
+  }
+});
+// client.get('favorites/list', function(error, tweets, response) {
+//   if (error) {
+//     console.log('error:', error);
+//   } else {
+//     console.log('tweets: ', tweets);
+//   }
+// });
+function postTweet(title, link) {
+  client.post('statuses/update', {status: title, link},  function(error, tweet, response) {
+  if(error) {
+    console.log('error:', error);
+  };
+  console.log(tweet);  // Tweet body.
+  console.log(response);  // Raw response object.
+});
+}
+
+
 // Routes
 app.get('/', function(req, res) {
     res.render('index.html');
@@ -42,7 +76,7 @@ app.get("/scrape", function(req, res) {
       result.title = $(this).children(".entry-title").text();
       result.body = $(this).children(".entry-summary").text().trim();
       result.link = $(this).children(".entry-title").children("a").attr("href");
-      console.log('result: ', result);
+      // console.log('result: ', result);
 
       var entry = new Post(result);
       entry.save(function(err, doc) {
@@ -50,7 +84,9 @@ app.get("/scrape", function(req, res) {
           console.log(err);
         }
         else {
-          console.log(doc);
+          console.log('>>>>>>>>>>>>>>> doc.title:', doc.title);
+          console.log('>>>>>>>>>>>>>>> doc.link:', doc.link);
+          // postTweet(doc.title + ' ' + doc.link)
         }
       });
     });
@@ -69,61 +105,41 @@ app.get("/posts", function(req, res) {
   });
 });
 
-app.get("/posts/:id", function(req, res) {
-  Post.findOne({ "_id": req.params.id })
-  .populate("note")
-  .exec(function(error, doc) {
-    if (error) {
-      console.log(error);
-    }
-    else {
-      res.json(doc);
-    }
-  });
-});
+// app.get("/posts/:id", function(req, res) {
+//   Post.findOne({ "_id": req.params.id })
+//   .populate("note")
+//   .exec(function(error, doc) {
+//     if (error) {
+//       console.log(error);
+//     }
+//     else {
+//       res.json(doc);
+//     }
+//   });
+// });
 
-app.post("/posts/:id", function(req, res) {
-  var newNote = new Note(req.body);
-  newNote.save(function(error, doc) {
-    if (error) {
-      console.log(error);
-    }
-    else {
-      Post.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
-      .exec(function(err, doc) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          res.send(doc);
-        }
-      });
-    }
-  });
-});
+// app.post("/posts/:id", function(req, res) {
+//   var newNote = new Note(req.body);
+//   newNote.save(function(error, doc) {
+//     if (error) {
+//       console.log(error);
+//     }
+//     else {
+//       Post.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
+//       .exec(function(err, doc) {
+//         if (err) {
+//           console.log(err);
+//         }
+//         else {
+//           res.send(doc);
+//         }
+//       });
+//     }
+//   });
+// });
 
-//Twitter Bot
-var Twitter = require("twitter");
-var config = require('./config.js');
-// console.log('config: ', config);
-var client = new Twitter(config);
 
-var params = {screen_name: 'tPhilosophia'};
 
-client.get('statuses/user_timeline', params, function(error, tweets, response) {
-  if (error) {
-    console.log('error:', error);
-  } else {
-    console.log(tweets);
-  }
-});
-client.get('favorites/list', function(error, tweets, response) {
-  if (error) {
-    console.log('error:', error);
-  } else {
-    console.log(tweets);
-  }
-});
 
 app.listen(3000, function() {
   console.log("App running on port 3000!");
