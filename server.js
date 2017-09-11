@@ -30,6 +30,10 @@ db.once("open", function() {
 
 
 // Routes
+app.get('/', function(req, res) {
+    res.render('index.html');
+});
+
 app.get("/scrape", function(req, res) {
   request("http://www.philosophymatters.org/", function(error, response, html) {
     var $ = cheerio.load(html);
@@ -96,6 +100,29 @@ app.post("/posts/:id", function(req, res) {
       });
     }
   });
+});
+
+//Twitter Bot
+var Twitter = require("twitter");
+var config = require('./config.js');
+// console.log('config: ', config);
+var client = new Twitter(config);
+
+var params = {screen_name: 'tPhilosophia'};
+
+client.get('statuses/user_timeline', params, function(error, tweets, response) {
+  if (error) {
+    console.log('error:', error);
+  } else {
+    console.log(tweets);
+  }
+});
+client.get('favorites/list', function(error, tweets, response) {
+  if (error) {
+    console.log('error:', error);
+  } else {
+    console.log(tweets);
+  }
 });
 
 app.listen(3000, function() {
