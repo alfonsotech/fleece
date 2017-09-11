@@ -79,14 +79,12 @@ app.get("/scrape", function(req, res) {
       // console.log('result: ', result);
 
       var entry = new Post(result);
-      entry.save(function(err, doc) {
+      entry.save(function(err, data) {
         if (err) {
           console.log(err);
         }
         else {
-          console.log('>>>>>>>>>>>>>>> doc.title:', doc.title);
-          console.log('>>>>>>>>>>>>>>> doc.link:', doc.link);
-          // postTweet(doc.title + ' ' + doc.link)
+          console.log('Saved To Database: ' + data);
         }
       });
     });
@@ -95,12 +93,24 @@ app.get("/scrape", function(req, res) {
 });
 
 app.get("/posts", function(req, res) {
-  Post.find({}, function(error, doc) {
+  Post.find({}, function(error, data) {
     if (error) {
       console.log(error);
     }
     else {
-      res.json(doc);
+      res.json(data);
+    }
+  });
+});
+
+app.get("/tweetout", function(req, res) {
+  Post.findOne({}, function(error, data) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+      postTweet(data.title + ' ' + data.link);
+      console.log('Tweeted out: '+ data.title + ' ' + data.link);
     }
   });
 });
@@ -108,30 +118,30 @@ app.get("/posts", function(req, res) {
 // app.get("/posts/:id", function(req, res) {
 //   Post.findOne({ "_id": req.params.id })
 //   .populate("note")
-//   .exec(function(error, doc) {
+//   .exec(function(error, data) {
 //     if (error) {
 //       console.log(error);
 //     }
 //     else {
-//       res.json(doc);
+//       res.json(data);
 //     }
 //   });
 // });
 
 // app.post("/posts/:id", function(req, res) {
 //   var newNote = new Note(req.body);
-//   newNote.save(function(error, doc) {
+//   newNote.save(function(error, data) {
 //     if (error) {
 //       console.log(error);
 //     }
 //     else {
-//       Post.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
-//       .exec(function(err, doc) {
+//       Post.findOneAndUpdate({ "_id": req.params.id }, { "note": data._id })
+//       .exec(function(err, data) {
 //         if (err) {
 //           console.log(err);
 //         }
 //         else {
-//           res.send(doc);
+//           res.send(data);
 //         }
 //       });
 //     }
