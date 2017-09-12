@@ -1,7 +1,6 @@
 //Twitter Bot
 var Twitter = require("twitter");
 var config = require('./config.js');
-// console.log('config: ', config);
 var client = new Twitter(config);
 
 var params = {screen_name: 'tPhilosophia', trim_user: true, exclude_replies: true, include_rts: false, count: 200};

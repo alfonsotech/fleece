@@ -4,7 +4,8 @@ var request = require("request");
 var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 var Post = require("../models/Post.js");
-var postTweet = require('../tweet.js')
+var postTweet = require('../tweet.js');
+var nightmare = require('../nightmare.js');
 
 //MongoDB/Mongoose Connection
 mongoose.Promise = Promise;
