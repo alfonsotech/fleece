@@ -5,6 +5,8 @@ var mongoose = require("mongoose");
 var Post = require("./models/Post.js");
 var request = require("request");
 var cheerio = require("cheerio");
+var Nightmare = require('nightmare');
+var nightmare = Nightmare({ show: true });
 
 mongoose.Promise = Promise;
 
@@ -28,6 +30,23 @@ db.once("open", function() {
   console.log("Mongoose connection successful.");
 });
 
+//Nightmare
+nightmare
+  .goto('https://plato.stanford.edu/')
+  .type('#search-text', 'plato')
+  .click('input#search-text')
+  .click('form#search-form > div.search-btn-wrapper:nth-child(2) > button.btn.search-btn:nth-child(1)')
+  .click('div#content > div.searchpage:nth-child(2) > div.search_results:nth-child(2) > div.result_listing:nth-child(2) > div.result_title:nth-child(1) > a.l:nth-child(1) > b:nth-child(1)')
+  .evaluate(function () {
+    return document.querySelector('#main-text').innerHTML;
+  })
+  .end()
+    .then(function (result) {
+      console.log(result)
+    })
+    .catch(function (error) {
+      console.error('Error:', error);
+    });
 
 //Twitter Bot
 var Twitter = require("twitter");
@@ -114,41 +133,6 @@ app.get("/tweetout", function(req, res) {
     }
   });
 });
-
-// app.get("/posts/:id", function(req, res) {
-//   Post.findOne({ "_id": req.params.id })
-//   .populate("note")
-//   .exec(function(error, data) {
-//     if (error) {
-//       console.log(error);
-//     }
-//     else {
-//       res.json(data);
-//     }
-//   });
-// });
-
-// app.post("/posts/:id", function(req, res) {
-//   var newNote = new Note(req.body);
-//   newNote.save(function(error, data) {
-//     if (error) {
-//       console.log(error);
-//     }
-//     else {
-//       Post.findOneAndUpdate({ "_id": req.params.id }, { "note": data._id })
-//       .exec(function(err, data) {
-//         if (err) {
-//           console.log(err);
-//         }
-//         else {
-//           res.send(data);
-//         }
-//       });
-//     }
-//   });
-// });
-
-
 
 
 app.listen(3000, function() {
