@@ -5,7 +5,8 @@ var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 var Post = require("../models/Post.js");
 var postTweet = require('../tweet.js');
-var nightmare = require('../nightmare.js');
+// var nightmare = require('../nightmare.js');
+var searchController = require('../controllers/searchController');
 
 //MongoDB/Mongoose Connection
 mongoose.Promise = Promise;
@@ -21,11 +22,12 @@ db.once("open", function() {
 });
 
 
-//Routes
+//HTML Routes
 router.get('/', function(req, res) {
     res.render('index.html');
 });
 
+//API Routes
 router.get("/scrape", function(req, res) {
   request("http://www.philosophymatters.org/", function(error, response, html) {
     var $ = cheerio.load(html);
@@ -72,6 +74,9 @@ router.get("/tweetout", function(req, res) {
     }
   });
 });
+
+router.post('/search', searchController.handleSearch)
+
 
 // app.get("/posts/:id", function(req, res) {
 //   Post.findOne({ "_id": req.params.id })
