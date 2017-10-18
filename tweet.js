@@ -3,7 +3,7 @@ var Twitter = require("twitter");
 var config = require('./config.js');
 var client = new Twitter(config);
 
-var params = {screen_name: 'tPhilosophia', trim_user: true, exclude_replies: true, include_rts: false, count: 200};
+var params = {screen_name: 'alfonsowebdev', trim_user: true, exclude_replies: true, include_rts: false, count: 200};
 
 client.get('statuses/user_timeline', params, function(error, tweets, response) {
   if (error) {
