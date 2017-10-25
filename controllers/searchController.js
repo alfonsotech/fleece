@@ -1,5 +1,5 @@
 exports.handleSearch = function(req, res) {
-  console.log('handleSearch')
+  // console.log('handleSearch')
   var searchTerm = req.body.searchTerm;
 
   if(searchTerm) {

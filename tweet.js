@@ -26,7 +26,7 @@ var postTweet = function (title, link) {
   if(error) {
     console.log('error:', error);
   };
-  console.log('tweet posted to Twitter');
+  console.log('tweet posted to Twitter: ', title, link);
 });
 }
 module.exports = postTweet

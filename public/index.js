@@ -18,3 +18,10 @@ console.log('inside click handler');
 $.get('/search', function(data) {
     console.log('data', data);
 })
+
+$.get('/posts', function(posts) {
+  console.log('posts', posts);
+  for (var i = 0; i < posts.length; i++) {
+    $('#posts').append(posts[i]);
+  }
+})

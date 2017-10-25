@@ -1,4 +1,4 @@
-var express = require('express')
+var express = require('express');
 var router = express.Router()
 var request = require("request");
 var cheerio = require("cheerio");
@@ -24,18 +24,29 @@ db.once("open", function() {
 
 //HTML Routes
 router.get('/', function(req, res) {
-    res.render('index.html');
+    // res.render('index.html');
 });
 
 //API Routes
 router.get("/scrape", function(req, res) {
-  request("http://www.philosophymatters.org/", function(error, response, html) {
+  request("http://jsfeeds.com/", function(error, response, html) {
     var $ = cheerio.load(html);
-    $(".post").each(function(i, element) {
+    $(".article").each(function(i, element) {
+      var $this = $(this);
       var result = {};
-      result.title = $(this).children(".entry-title").text();
-      result.body = $(this).children(".entry-summary").text().trim();
-      result.link = $(this).children(".entry-title").children("a").attr("href");
+
+      var title = $(this).children("div").children(".article_body").children("div.container-fluid").children("div.row").children("div.col-md-18").children("h3").children("a").text();
+      splitTitle = title.split('');
+      var shortTitle = []
+      for(var i = 0; i<120; i++) {
+        shortTitle.push(splitTitle[i]);
+      }
+      shortTitle = shortTitle.join('')
+
+      result.title = shortTitle + '...';
+      var link = $(this).children("div").children(".article_body").children("div.container-fluid").children("div.row").children("div.col-md-18").children("h3").children("a").attr("href");
+      result.link = 'http://jsfeeds.com' + link;
+      console.log(result);
 
       var entry = new Post(result);
       entry.save(function(err, data) {
@@ -48,7 +59,41 @@ router.get("/scrape", function(req, res) {
       });
     });
   });
-  res.send("Scrape Complete");
+  res.redirect("/scrapemediumfcc");
+});
+
+router.get("/scrapemediumfcc", function(req, res) {
+  request("https://medium.freecodecamp.org/", function(error, response, html) {
+    var $ = cheerio.load(html);
+    $(".postArticle").each(function(i, element) {
+      var $this = $(this);
+      var result = {};
+
+      var title = $(this).children(".js-trackedPost").children('a').children('.postArticle-content').children('.section').children('.section-content').children('.section-inner').children("h3").text();
+      splitTitle = title.split('');
+      var shortTitle = []
+      for(var i = 0; i<120; i++) {
+        shortTitle.push(splitTitle[i]);
+      }
+      shortTitle = shortTitle.join('')
+
+      result.title = shortTitle + '...';
+      var link = $(this).children(".js-trackedPost").children('a').attr("href");
+      result.link = link;
+      console.log(result);
+
+      var entry = new Post(result);
+      entry.save(function(err, data) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          console.log('Saved To Database: ' + data);
+        }
+      });
+    });
+  });
+    res.redirect("/tweetout");
 });
 
 router.get("/posts", function(req, res) {
@@ -62,20 +107,25 @@ router.get("/posts", function(req, res) {
   });
 });
 
+
 router.get("/tweetout", function(req, res) {
-  Post.findOne({}, function(error, data) {
+  Post.find({}, function(error, data) {
     if (error) {
       console.log(error);
     }
     else {
-      postTweet(data.title + ' ' + data.link);
+      console.log('data', data);
+      var indexNum = Math.floor(Math.random() * data.length);
+      console.log('indexNum', indexNum);
+      postTweet(data[indexNum].title + ' ' + data[indexNum].link);
       console.log('Tweeted out: '+ data.title + ' ' + data.link);
-      res.redirect('/')
+      res.redirect('/posts');
     }
   });
+
 });
 
-router.post('/search', searchController.handleSearch)
+// router.post('/search', searchController.handleSearch)
 
 
 // app.get("/posts/:id", function(req, res) {
@@ -92,7 +142,7 @@ router.post('/search', searchController.handleSearch)
 // });
 
 // app.post("/posts/:id", function(req, res) {
-//   var newNote = new Note(req.body);
+//   var newNote = new Post(req.body);
 //   newNote.save(function(error, data) {
 //     if (error) {
 //       console.log(error);
