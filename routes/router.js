@@ -26,13 +26,16 @@ db.once("open", function() {
 
 //HTML Routes
 router.get('/', function(req, res) {
-    // res.render('index.html');
+    //Scrape JSFeeds and MediumFCC every 24 hours
+    setInterval(scrape.scrapeJSFeeds, 86400000);
+    setInterval(scrape.scrapeMediumFCC, 86400000);
 });
 
 //API Routes
 router.get("/scrape", function(req, res) {
-  scrape.scrapeJSFeeds();
-  scrape.scrapeMediumFCC();
+  //Scrape JSFeeds and MediumFCC every 24 hours
+  setInterval(scrape.scrapeJSFeeds, 86400000);
+  setInterval(scrape.scrapeMediumFCC, 86400000);
 });
 
 router.get("/posts", function(req, res) {
@@ -48,23 +51,11 @@ router.get("/posts", function(req, res) {
 
 
 router.get("/tweetout", function(req, res) {
-  setInterval(tweetOut, 30000)
+  setInterval(tweetOut, 300000)
 });
 
 
-// var tweetOut = function() {
-//   Post.find({}, function(error, data) {
-//     if (error) {
-//       console.log(error);
-//     }
-//     else {
-//       var indexNum = Math.floor(Math.random() * data.length);
-//       postTweet(data[indexNum].title + ' ' + data[indexNum].link);
-//       console.log('Tweeted out: '+ data.title + ' ' + data.link);
-//     }
-//   });
-// }
-// setInterval(tweetOut, 300000)
+//TODO: CURRENTLY UNUSED ROUTES
 // router.post('/search', searchController.handleSearch)
 
 
