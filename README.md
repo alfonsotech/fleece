@@ -24,14 +24,14 @@ Set your remote upstream to the original repo.
 
 ## Versioning
 
-body-parser - 1.15.0 \newline
-cheerio - 0.20.0 \newline
-express - 4.13.4 \newline
-mongoose - 4.4.6
-morgan - 1.8.2
-nightmare - 2.10.0
-request - 2.69.0
-twitter - 1.7.1
+body-parser - 1.15.0   
+cheerio - 0.20.0   
+express - 4.13.4   
+mongoose - 4.4.6   
+morgan - 1.8.2   
+nightmare - 2.10.0   
+request - 2.69.0   
+twitter - 1.7.1   
 
 
 ## Author(s)
