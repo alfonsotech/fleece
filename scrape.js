@@ -15,9 +15,8 @@ db.once("open", function() {
 });
 
 var scrape = {
-  //scrape JSFeeds every 24 hours
-  scrapeJSFeeds: setInterval(
-    function() {
+  scrapeJSFeeds: function() {
+    console.log('inside scrapeJSFeeds');
       request("http://jsfeeds.com/", function(error, response, html) {
         var $ = cheerio.load(html);
         $(".article").each(function(i, element) {
@@ -47,10 +46,9 @@ var scrape = {
           });
         });
       });
-    }, 86400000),
-    //scrape MediumFCC every 24 hours
-    scrapeMediumFCC: setInterval(
-      function() {
+    },
+    scrapeMediumFCC: function() {
+      console.log('inside scrapeMediumFCC');
         request("https://medium.freecodecamp.org/", function(error, response, html) {
           var $ = cheerio.load(html);
           $(".postArticle").each(function(i, element) {
@@ -82,8 +80,7 @@ var scrape = {
               });
             });
           });
-        }, 86400000)
+        }
 }
-
 
 module.exports = scrape;
