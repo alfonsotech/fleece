@@ -24,7 +24,7 @@ Set your remote upstream to the original repo.
 
 ## Versioning
 
-body-parser - 1.15.0
+body-parser - 1.15.0,
 cheerio - 0.20.0
 express - 4.13.4
 mongoose - 4.4.6
