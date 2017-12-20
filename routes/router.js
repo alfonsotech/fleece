@@ -4,7 +4,9 @@ var request = require("request");
 var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 var Post = require("../models/Post.js");
-var postTweet = require('../tweet.js');
+// var postTweet = require('../tweet.js');
+var scrape = require('../scrape.js');
+var tweetOut = require('../tweetOut.js');
 // var nightmare = require('../nightmare.js');
 var searchController = require('../controllers/searchController');
 
@@ -29,71 +31,8 @@ router.get('/', function(req, res) {
 
 //API Routes
 router.get("/scrape", function(req, res) {
-  request("http://jsfeeds.com/", function(error, response, html) {
-    var $ = cheerio.load(html);
-    $(".article").each(function(i, element) {
-      var $this = $(this);
-      var result = {};
-
-      var title = $(this).children("div").children(".article_body").children("div.container-fluid").children("div.row").children("div.col-md-18").children("h3").children("a").text();
-      splitTitle = title.split('');
-      var shortTitle = []
-      for(var i = 0; i<120; i++) {
-        shortTitle.push(splitTitle[i]);
-      }
-      shortTitle = shortTitle.join('')
-
-      result.title = shortTitle + '...';
-      var link = $(this).children("div").children(".article_body").children("div.container-fluid").children("div.row").children("div.col-md-18").children("h3").children("a").attr("href");
-      result.link = 'http://jsfeeds.com' + link;
-      console.log(result);
-
-      var entry = new Post(result);
-      entry.save(function(err, data) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          console.log('Saved To Database: ' + data);
-        }
-      });
-    });
-  });
-  res.redirect("/scrapemediumfcc");
-});
-
-router.get("/scrapemediumfcc", function(req, res) {
-  request("https://medium.freecodecamp.org/", function(error, response, html) {
-    var $ = cheerio.load(html);
-    $(".postArticle").each(function(i, element) {
-      var $this = $(this);
-      var result = {};
-
-      var title = $(this).children(".js-trackedPost").children('a').children('.postArticle-content').children('.section').children('.section-content').children('.section-inner').children("h3").text();
-      splitTitle = title.split('');
-      var shortTitle = []
-      for(var i = 0; i<120; i++) {
-        shortTitle.push(splitTitle[i]);
-      }
-      shortTitle = shortTitle.join('')
-
-      result.title = shortTitle + '...';
-      var link = $(this).children(".js-trackedPost").children('a').attr("href");
-      result.link = link;
-      console.log(result);
-
-      var entry = new Post(result);
-      entry.save(function(err, data) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          console.log('Saved To Database: ' + data);
-        }
-      });
-    });
-  });
-    res.redirect("/tweetout");
+  scrape.scrapeJSFeeds();
+  scrape.scrapeMediumFCC();
 });
 
 router.get("/posts", function(req, res) {
@@ -109,28 +48,29 @@ router.get("/posts", function(req, res) {
 
 
 router.get("/tweetout", function(req, res) {
-  Post.find({}, function(error, data) {
-    if (error) {
-      console.log(error);
-    }
-    else {
-      console.log('data', data);
-      var indexNum = Math.floor(Math.random() * data.length);
-      console.log('indexNum', indexNum);
-      postTweet(data[indexNum].title + ' ' + data[indexNum].link);
-      console.log('Tweeted out: '+ data.title + ' ' + data.link);
-      res.redirect('/posts');
-    }
-  });
-
+  setInterval(tweetOut, 30000)
 });
 
+
+// var tweetOut = function() {
+//   Post.find({}, function(error, data) {
+//     if (error) {
+//       console.log(error);
+//     }
+//     else {
+//       var indexNum = Math.floor(Math.random() * data.length);
+//       postTweet(data[indexNum].title + ' ' + data[indexNum].link);
+//       console.log('Tweeted out: '+ data.title + ' ' + data.link);
+//     }
+//   });
+// }
+// setInterval(tweetOut, 300000)
 // router.post('/search', searchController.handleSearch)
 
 
 // app.get("/posts/:id", function(req, res) {
 //   Post.findOne({ "_id": req.params.id })
-//   .populate("note")
+//   .populate("post")
 //   .exec(function(error, data) {
 //     if (error) {
 //       console.log(error);
@@ -142,13 +82,13 @@ router.get("/tweetout", function(req, res) {
 // });
 
 // app.post("/posts/:id", function(req, res) {
-//   var newNote = new Post(req.body);
-//   newNote.save(function(error, data) {
+//   var newPost = new Post(req.body);
+//   newPost.save(function(error, data) {
 //     if (error) {
 //       console.log(error);
 //     }
 //     else {
-//       Post.findOneAndUpdate({ "_id": req.params.id }, { "note": data._id })
+//       Post.findOneAndUpdate({ "_id": req.params.id }, { "post": data._id })
 //       .exec(function(err, data) {
 //         if (err) {
 //           console.log(err);
